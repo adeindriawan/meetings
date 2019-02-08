@@ -33,8 +33,10 @@ class App extends Component {
 
 		const code = jsQR(scanImageData.data, 350, 350);
 		if (code) {
+			alert('Yes');
 			console.log(code);
 		} else {
+			alert('No');
 			console.log('Not found');
 			console.log(scanImageData.data);
 		}
