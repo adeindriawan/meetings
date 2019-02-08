@@ -33,7 +33,7 @@ class App extends Component {
 
 		const code = jsQR(scanImageData.data, 350, 350);
 		if (code) {
-			alert('Yes');
+			alert(code);
 			console.log(code);
 		} else {
 			alert('No');
@@ -71,9 +71,12 @@ class App extends Component {
 	};
 
 	render() {
+		const videoConstraints = {
+			facingMode: {exact: "environment"}
+		};
 		return (
 			<div className="App">
-				<Webcam audio={false} height={350} ref={this.setRef} screenshotFormat="image/jpeg" width={350} />
+				<Webcam audio={false} height={350} ref={this.setRef} videoConstraints={videoConstraints} screenshotFormat="image/jpeg" width={350} />
 				
 				<p>{this.state.response}</p>
 				<form onSubmit={this.handleSubmit}>
