@@ -17,31 +17,31 @@ class App extends Component {
 		this.webcam = webcam;
 	}
 
-	capture = () => {
-		const imageSrc = this.webcam.getScreenshot();
-
+	initContext = () => {
 		let canvas = document.getElementById("canvas");
-		let ctx = canvas.getContext('2d');
-		let image = new Image();
-		image.onload = () => {
-			ctx.drawImage(image, 0, 0);
+		let context = canvas.getContext("2d");
+		return context;
+	}
+
+	loadImage = (imageSource, context) => {
+		let imageObj = new Image();
+		imageObj.onload = () => {
+			context.drawImage(imageObj, 0, 0);
+			let imageData = context.getImageData(0, 0, 350, 350);
+			this.readImage(imageData);
 		}
-		image.src = imageSrc;
-		let scanImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		imageObj.src = imageSource;
+	}
 
-		this.setState({imageBase64: imageSrc});
-
-		const code = jsQR(scanImageData.data, 350, 350);
+	readImage = (imageData) => {
+		let code = jsQR(imageData.data, 350, 350);
 		if (code) {
-			alert(code);
-			console.log(code);
+			alert(code.data);
 		} else {
-			alert('No');
-			console.log('Not found');
-			console.log(scanImageData.data);
+			alert("Failed to decode the QR Code. Please scan the QR Code again.");
 		}
 	}
-	
+
 	componentDidMount() {
 		this.callApi()
 			.then(res => this.setState({ response: res.express }))
@@ -57,8 +57,9 @@ class App extends Component {
 	
 	handleSubmit = async e => {
 		e.preventDefault();
-    await this.capture();
-    console.log(this.state.post);
+		const imageSrc = await this.webcam.getScreenshot();
+		let context = await this.initContext();
+		await this.loadImage(imageSrc, context);
 		const response = await fetch('/api/world', {
 			method: 'POST',
 			headers: {
